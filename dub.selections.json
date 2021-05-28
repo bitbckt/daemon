@@ -1,0 +1,8 @@
+{
+	"fileVersion": 1,
+	"versions": {
+		"colorize": "1.0.5",
+		"daemonize": "0.2.1",
+		"dlogg": "0.4.1"
+	}
+}

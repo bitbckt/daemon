@@ -1,0 +1,6 @@
+name "daemon"
+description "A minimal D application."
+authors "Brandon Mitchell"
+copyright "Copyright © 2021, Brandon Mitchell"
+license "proprietary"
+dependency "dlogg" version="~>0.4.1"

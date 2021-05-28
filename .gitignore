@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/daemon
+daemon.so
+daemon.dylib
+daemon.dll
+daemon.a
+daemon.lib
+daemon-test-*
+*.exe
+*.o
+*.obj
+*.lst
