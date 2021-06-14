@@ -148,7 +148,7 @@ nothrow @nogc private int redirectDescriptors() {
 }
 
 nothrow private pid_t daemonize(uid_t user, gid_t group) {
-    import core.stdc.stdlib : malloc;
+    import core.stdc.stdlib : malloc, free;
 
     rlimit rl;
 
@@ -179,6 +179,8 @@ nothrow private pid_t daemonize(uid_t user, gid_t group) {
             }
         }
     }
+
+    free(fds);
 
     version (linux) {
         const int nsig = SIGRTMAX;
