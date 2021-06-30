@@ -8,7 +8,7 @@ version (Posix) {
     static assert(0);
 }
 
-nothrow int serve() {
+int serve() nothrow {
     // NB. Allows nothrow code to call throw code.
     scope (failure) {
         return 1;
@@ -41,7 +41,8 @@ int main() {
         return -1;
     }
 
-    pid_t pid = daemon.run("/var/run/daemon.pid", user.pw_uid, user.pw_gid, &serve, &exit_code);
+    const pid_t pid =
+        daemon.run("/var/run/daemon.pid", user.pw_uid, user.pw_gid, &serve, &exit_code);
 
     if (pid == -1) {
         return -1;

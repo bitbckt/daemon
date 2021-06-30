@@ -13,32 +13,32 @@ version (Posix) {
     static assert(0);
 }
 
-nothrow @nogc @trusted private void writeCode(int fd, int code) {
+private void writeCode(int fd, int code) nothrow @nogc @trusted {
     write(fd, &code, code.sizeof);
 }
 
-nothrow @nogc @trusted private void writePID(int fd, pid_t pid) {
+private void writePID(int fd, pid_t pid) nothrow @nogc @trusted {
     write(fd, &pid, pid.sizeof);
 }
 
-nothrow @nogc @trusted private int readCode(int fd) {
+private int readCode(int fd) nothrow @nogc @trusted {
     int code;
     read(fd, &code, code.sizeof);
     return code;
 }
 
-nothrow @nogc @trusted private pid_t readPID(int fd) {
+private pid_t readPID(int fd) nothrow @nogc @trusted {
     pid_t pid;
     read(fd, &pid, pid.sizeof);
     return pid;
 }
 
-nothrow @nogc @trusted private void waitPID(pid_t pid) {
+private void waitPID(pid_t pid) nothrow @nogc @trusted {
     int status;
     waitpid(pid, &status, 0);
 }
 
-nothrow @nogc @safe private pid_t doubleFork(int[2] pipefd, uid_t user, gid_t group) {
+private pid_t doubleFork(int[2] pipefd, uid_t user, gid_t group) nothrow @nogc @safe {
     assert(user != 0);
     assert(group != 0);
 
@@ -106,7 +106,7 @@ nothrow @nogc @safe private pid_t doubleFork(int[2] pipefd, uid_t user, gid_t gr
 
         close(pipefd[1]);
 
-        int code = readCode(pipefd[0]);
+        const int code = readCode(pipefd[0]);
 
         if (code == 0) {
             pid = readPID(pipefd[0]);
@@ -126,7 +126,7 @@ nothrow @nogc @safe private pid_t doubleFork(int[2] pipefd, uid_t user, gid_t gr
     assert(0);
 }
 
-nothrow @nogc private int redirectDescriptors() {
+private int redirectDescriptors() nothrow @nogc {
     // Close standard FDs.
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
@@ -147,7 +147,7 @@ nothrow @nogc private int redirectDescriptors() {
     return 0;
 }
 
-nothrow private pid_t daemonize(uid_t user, gid_t group) {
+private pid_t daemonize(uid_t user, gid_t group) nothrow {
     import core.stdc.stdlib : malloc, free;
 
     rlimit rl;
@@ -229,7 +229,9 @@ nothrow private pid_t daemonize(uid_t user, gid_t group) {
         return pid;
     }
 
-    redirectDescriptors();
+    if (redirectDescriptors() != 0) {
+        return -1;
+    }
 
     // Change pwd to the root.
     if (chdir("/") != 0) {
@@ -243,7 +245,7 @@ nothrow private pid_t daemonize(uid_t user, gid_t group) {
     return pid;
 }
 
-nothrow private int checkFile(scope const char[] pidfile) {
+private int checkFile(scope const char[] pidfile) nothrow {
     import std.string : toStringz;
 
     flock fl;
@@ -285,12 +287,12 @@ nothrow private int checkFile(scope const char[] pidfile) {
     return 0;
 }
 
-nothrow pid_t run(scope string pidfile, uid_t user, uid_t group,
-        int function() nothrow fn, int* exit_code) {
+pid_t run(scope string pidfile, uid_t user, uid_t group,
+        int function() nothrow fn, int* exit_code) nothrow {
     import core.stdc.string : strlen;
     import std.string : toStringz;
 
-    int status = checkFile(pidfile);
+    const int status = checkFile(pidfile);
 
     if (status == -1) {
         // daemon already running
@@ -346,7 +348,7 @@ nothrow pid_t run(scope string pidfile, uid_t user, uid_t group,
         return -1;
     }
 
-    int code = fn();
+    const int code = fn();
     if (exit_code != null) {
         *exit_code = code;
     }
